@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>&lt;model-viewer&gt; template</title>
+    <meta charset="utf-8">
+    <meta name="description" content="&lt;model-viewer&gt; template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link type="text/css" href="./styles.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="container">
+      <div class="model-container">
+        <!-- Loading overlay -->
+        <div id="loading-overlay">
+          <div class="spinner"></div>
+          <!-- <div class="loading-text">Loading Model...</div> -->
+        </div>
+        
+        <!-- <model-viewer> HTML element -->
+        <model-viewer id="model-viewer" src="1350_with_Canopy.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="1">
+          <div class="progress-bar hide" slot="progress-bar">
+              <div class="update-bar"></div>
+          </div>
+          <button slot="ar-button" id="ar-button">
+              View in your space
+          </button>
+          <div id="ar-prompt">
+              <img src="ar_hand_prompt.png">
+          </div>
+        </model-viewer>
+      </div>
+      
+      <div class="controls">
+        <button id="canopyOn" class="active">Canopy On</button>
+        <button id="canopyOff">Canopy Off</button>
+      </div>
+    </div>
+    
+    <script>
+      // Get the model-viewer element
+      const modelViewer = document.getElementById('model-viewer');
+      const loadingOverlay = document.getElementById('loading-overlay');
+      const buttons = document.querySelectorAll('.controls button');
+      
+      // Function to show active button
+      function setActiveButton(activeButton) {
+        buttons.forEach(button => {
+          button.classList.remove('active');
+        });
+        activeButton.classList.add('active');
+      }
+      
+      // Show loading overlay when loading starts
+      modelViewer.addEventListener('loading', function() {
+        loadingOverlay.style.display = 'flex';
+      });
+      
+      // Hide loading overlay when the model is loaded
+      modelViewer.addEventListener('load', function() {
+        loadingOverlay.style.display = 'none';
+      });
+      
+      // Add event listeners to buttons
+      document.getElementById('canopyOn').addEventListener('click', (event) => {
+        loadingOverlay.style.display = 'flex';
+        modelViewer.src = '1350_with_Canopy.glb';
+        setActiveButton(event.target);
+      });
+      
+      document.getElementById('canopyOff').addEventListener('click', (event) => {
+        loadingOverlay.style.display = 'flex';
+        modelViewer.src = '1350_without_Canopy.glb';
+        setActiveButton(event.target);
+      });
+    </script>
+    
+    <!-- Loads <model-viewer> for browsers: -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+  </body>
+</html>
