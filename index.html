@@ -5,7 +5,139 @@
     <meta charset="utf-8">
     <meta name="description" content="&lt;model-viewer&gt; template">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link type="text/css" href="./styles.css" rel="stylesheet"/>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+      
+      .container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100vh;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .model-container {
+        position: relative;
+        width: 100%;
+        height: 80vh;
+      }
+      
+      model-viewer {
+        width: 100%;
+        height: 100%;
+        background-color: #f5f5f5;
+      }
+      
+      #loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #ccc;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .controls {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+      }
+      
+      .controls button {
+        padding: 10px 15px;
+        border: none;
+        background-color: #ddd;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      
+      .controls button.active {
+        background-color: #3498db;
+        color: white;
+      }
+      
+      #ar-button {
+        background-color: #3498db;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        padding: 10px 15px;
+        cursor: pointer;
+      }
+      
+      #ar-prompt {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: pulse 2s infinite;
+        display: none;
+      }
+      
+      @keyframes pulse {
+        0% { opacity: 0.5; }
+        50% { opacity: 1; }
+        100% { opacity: 0.5; }
+      }
+      
+      /* AR mode controls */
+      .ar-controls {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: none;
+        z-index: 1000;
+        flex-direction: row;
+        gap: 10px;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 10px;
+        border-radius: 8px;
+      }
+      
+      .ar-controls button {
+        padding: 12px 20px;
+        border: none;
+        background-color: #fff;
+        color: #000;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      
+      .ar-controls button.active {
+        background-color: #3498db;
+        color: white;
+      }
+      
+      /* Show AR controls when in AR mode */
+      model-viewer[ar-status="session-started"] ~ .ar-controls {
+        display: flex;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
@@ -17,17 +149,23 @@
         </div>
         
         <!-- <model-viewer> HTML element -->
-        <model-viewer id="model-viewer" src="1350_with_Canopy.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="1">
+        <model-viewer id="model-viewer" src="1700x.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="1">
           <div class="progress-bar hide" slot="progress-bar">
-              <div class="update-bar"></div>
+            <div class="update-bar"></div>
           </div>
           <button slot="ar-button" id="ar-button">
-              View in your space
+            View in your space
           </button>
           <div id="ar-prompt">
-              <img src="ar_hand_prompt.png">
+            <img src="ar_hand_prompt.png">
           </div>
         </model-viewer>
+
+        <!-- AR mode controls that appear when in AR -->
+        <div class="ar-controls">
+          <button id="ar-canopyOn" class="active">Canopy On</button>
+          <button id="ar-canopyOff">Canopy Off</button>
+        </div>
       </div>
       
       <div class="controls">
@@ -41,10 +179,14 @@
       const modelViewer = document.getElementById('model-viewer');
       const loadingOverlay = document.getElementById('loading-overlay');
       const buttons = document.querySelectorAll('.controls button');
+      const arButtons = document.querySelectorAll('.ar-controls button');
+      
+      // Track current model state
+      let currentModel = '1700x.glb';
       
       // Function to show active button
-      function setActiveButton(activeButton) {
-        buttons.forEach(button => {
+      function setActiveButton(activeButton, buttonGroup) {
+        buttonGroup.forEach(button => {
           button.classList.remove('active');
         });
         activeButton.classList.add('active');
@@ -60,17 +202,54 @@
         loadingOverlay.style.display = 'none';
       });
       
-      // Add event listeners to buttons
+      // Add event listeners to normal mode buttons
       document.getElementById('canopyOn').addEventListener('click', (event) => {
         loadingOverlay.style.display = 'flex';
-        modelViewer.src = '1350_with_Canopy.glb';
-        setActiveButton(event.target);
+        modelViewer.src = '1700x.glb';
+        currentModel = '1700x.glb';
+        setActiveButton(event.target, buttons);
+        // Also update AR button state for consistency
+        setActiveButton(document.getElementById('ar-canopyOn'), arButtons);
       });
       
       document.getElementById('canopyOff').addEventListener('click', (event) => {
         loadingOverlay.style.display = 'flex';
-        modelViewer.src = '1350_without_Canopy.glb';
-        setActiveButton(event.target);
+        modelViewer.src = '1700x-without-Canopy.glb';
+        currentModel = '1700x-without-Canopy.glb';
+        setActiveButton(event.target, buttons);
+        // Also update AR button state for consistency
+        setActiveButton(document.getElementById('ar-canopyOff'), arButtons);
+      });
+      
+      // Add event listeners to AR mode buttons
+      document.getElementById('ar-canopyOn').addEventListener('click', (event) => {
+        if (currentModel !== '1700x.glb') {
+          currentModel = '1700x.glb';
+          modelViewer.src = currentModel;
+          setActiveButton(event.target, arButtons);
+          // Also update normal button state for consistency
+          setActiveButton(document.getElementById('canopyOn'), buttons);
+        }
+      });
+      
+      document.getElementById('ar-canopyOff').addEventListener('click', (event) => {
+        if (currentModel !== '1700x-without-Canopy.glb') {
+          currentModel = '1700x-without-Canopy.glb';
+          modelViewer.src = currentModel;
+          setActiveButton(event.target, arButtons);
+          // Also update normal button state for consistency
+          setActiveButton(document.getElementById('canopyOff'), buttons);
+        }
+      });
+      
+      // Monitor AR mode status
+      modelViewer.addEventListener('ar-status', (event) => {
+        if (event.detail.status === 'session-started') {
+          console.log('AR session started');
+          // AR session has started, making buttons visible is handled by CSS
+        } else if (event.detail.status === 'session-ended') {
+          console.log('AR session ended');
+        }
       });
     </script>
     
