@@ -126,6 +126,7 @@
         color: #000;
         border-radius: 4px;
         cursor: pointer;
+        font-weight: bold;
       }
       
       .ar-controls button.active {
@@ -183,6 +184,7 @@
       
       // Track current model state
       let currentModel = '1700x.glb';
+      let isInAR = false;
       
       // Function to show active button
       function setActiveButton(activeButton, buttonGroup) {
@@ -202,53 +204,67 @@
         loadingOverlay.style.display = 'none';
       });
       
+      // Switch model function (works in both normal and AR modes)
+      function switchModel(modelSrc, canopyOnButton, canopyOffButton) {
+        if (currentModel !== modelSrc) {
+          currentModel = modelSrc;
+          
+          // If we're not in AR mode, show loading overlay
+          if (!isInAR) {
+            loadingOverlay.style.display = 'flex';
+          }
+          
+          modelViewer.src = modelSrc;
+          
+          // Update active button states
+          if (modelSrc === '1700x.glb') {
+            setActiveButton(document.getElementById('canopyOn'), buttons);
+            setActiveButton(document.getElementById('ar-canopyOn'), arButtons);
+          } else {
+            setActiveButton(document.getElementById('canopyOff'), buttons);
+            setActiveButton(document.getElementById('ar-canopyOff'), arButtons);
+          }
+        }
+      }
+      
       // Add event listeners to normal mode buttons
-      document.getElementById('canopyOn').addEventListener('click', (event) => {
-        loadingOverlay.style.display = 'flex';
-        modelViewer.src = '1700x.glb';
-        currentModel = '1700x.glb';
-        setActiveButton(event.target, buttons);
-        // Also update AR button state for consistency
-        setActiveButton(document.getElementById('ar-canopyOn'), arButtons);
+      document.getElementById('canopyOn').addEventListener('click', () => {
+        switchModel('1700x.glb');
       });
       
-      document.getElementById('canopyOff').addEventListener('click', (event) => {
-        loadingOverlay.style.display = 'flex';
-        modelViewer.src = '1700x-without-Canopy.glb';
-        currentModel = '1700x-without-Canopy.glb';
-        setActiveButton(event.target, buttons);
-        // Also update AR button state for consistency
-        setActiveButton(document.getElementById('ar-canopyOff'), arButtons);
+      document.getElementById('canopyOff').addEventListener('click', () => {
+        switchModel('1700x-without-Canopy.glb');
       });
       
       // Add event listeners to AR mode buttons
-      document.getElementById('ar-canopyOn').addEventListener('click', (event) => {
-        if (currentModel !== '1700x.glb') {
-          currentModel = '1700x.glb';
-          modelViewer.src = currentModel;
-          setActiveButton(event.target, arButtons);
-          // Also update normal button state for consistency
-          setActiveButton(document.getElementById('canopyOn'), buttons);
-        }
+      document.getElementById('ar-canopyOn').addEventListener('click', () => {
+        switchModel('1700x.glb');
       });
       
-      document.getElementById('ar-canopyOff').addEventListener('click', (event) => {
-        if (currentModel !== '1700x-without-Canopy.glb') {
-          currentModel = '1700x-without-Canopy.glb';
-          modelViewer.src = currentModel;
-          setActiveButton(event.target, arButtons);
-          // Also update normal button state for consistency
-          setActiveButton(document.getElementById('canopyOff'), buttons);
-        }
+      document.getElementById('ar-canopyOff').addEventListener('click', () => {
+        switchModel('1700x-without-Canopy.glb');
       });
       
       // Monitor AR mode status
       modelViewer.addEventListener('ar-status', (event) => {
         if (event.detail.status === 'session-started') {
           console.log('AR session started');
+          isInAR = true;
           // AR session has started, making buttons visible is handled by CSS
         } else if (event.detail.status === 'session-ended') {
           console.log('AR session ended');
+          isInAR = false;
+        } else if (event.detail.status === 'failed') {
+          console.log('AR session failed to start');
+          isInAR = false;
+        }
+      });
+      
+      // Handle model changes requested within AR
+      modelViewer.addEventListener('ar-status', (event) => {
+        if (event.detail.status === 'object-placed') {
+          console.log('Object placed in AR');
+          // Additional functionality when object is placed
         }
       });
     </script>
