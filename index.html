@@ -1,17 +1,18 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <title>&lt;model-viewer&gt; template</title>
-    <meta charset="utf-8">
-    <meta name="description" content="&lt;model-viewer&gt; template">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="description" content="&lt;model-viewer&gt; template" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link type="text/css" href="./styles.css" rel="stylesheet"/>
     <style>
       body {
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
       }
-      
+
       .container {
         display: flex;
         flex-direction: column;
@@ -20,19 +21,19 @@
         align-items: center;
         justify-content: center;
       }
-      
+
       .model-container {
         position: relative;
         width: 100%;
         height: 80vh;
       }
-      
+
       model-viewer {
         width: 100%;
         height: 100%;
         background-color: #f5f5f5;
       }
-      
+
       #loading-overlay {
         position: absolute;
         top: 0;
@@ -46,7 +47,7 @@
         justify-content: center;
         z-index: 10;
       }
-      
+
       .spinner {
         width: 40px;
         height: 40px;
@@ -55,18 +56,22 @@
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
-      
+
       @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
-      
+
       .controls {
         margin-top: 20px;
         display: flex;
         gap: 10px;
       }
-      
+
       .controls button {
         padding: 10px 15px;
         border: none;
@@ -74,36 +79,57 @@
         cursor: pointer;
         border-radius: 4px;
       }
-      
+
       .controls button.active {
         background-color: #3498db;
         color: white;
       }
-      
-      #ar-button {
-        background-color: #3498db;
-        border: none;
-        border-radius: 4px;
-        color: white;
-        padding: 10px 15px;
-        cursor: pointer;
-      }
-      
-      #ar-prompt {
+
+      /* #ar-button {
+        background-image: url(ar_icon.png);
+        background-repeat: no-repeat;
+        background-size: 20px 20px;
+        background-position: 12px 50%;
+        background-color: #fff;
         position: absolute;
-        bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
-        animation: pulse 2s infinite;
-        display: none;
+        white-space: nowrap;
+        bottom: 16px;
+        padding: 0px 16px 0px 40px;
+        font-family: Roboto Regular, Helvetica Neue, sans-serif;
+        font-size: 14px;
+        color: #4285f4;
+        height: 36px;
+        line-height: 36px;
+        border-radius: 18px;
+        border: 1px solid #dadce0;
       }
-      
+
+      #ar-button:active {
+        background-color: #e8eaed;
+      }
+
+      #ar-button:focus {
+        outline: none;
+      }
+
+      #ar-button:focus-visible {
+        outline: 1px solid #4285f4;
+      } */
+
       @keyframes pulse {
-        0% { opacity: 0.5; }
-        50% { opacity: 1; }
-        100% { opacity: 0.5; }
+        0% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.5;
+        }
       }
-      
+
       /* AR mode controls */
       .ar-controls {
         position: fixed;
@@ -118,7 +144,7 @@
         padding: 10px;
         border-radius: 8px;
       }
-      
+
       .ar-controls button {
         padding: 12px 20px;
         border: none;
@@ -128,12 +154,12 @@
         cursor: pointer;
         font-weight: bold;
       }
-      
+
       .ar-controls button.active {
         background-color: #3498db;
         color: white;
       }
-      
+
       /* Show AR controls when in AR mode */
       model-viewer[ar-status="session-started"] ~ .ar-controls {
         display: flex;
@@ -148,17 +174,24 @@
           <div class="spinner"></div>
           <!-- <div class="loading-text">Loading Model...</div> -->
         </div>
-        
+
         <!-- <model-viewer> HTML element -->
-        <model-viewer id="model-viewer" src="with_Canopy.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="1">
+        <model-viewer
+          id="model-viewer"
+          src="with_Canopy.glb"
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          camera-controls
+          tone-mapping="neutral"
+          poster="poster.webp"
+          shadow-intensity="1"
+        >
           <div class="progress-bar hide" slot="progress-bar">
             <div class="update-bar"></div>
           </div>
-          <button slot="ar-button" id="ar-button">
-            View in your space
-          </button>
+          <button slot="ar-button" id="ar-button">View in your space</button>
           <div id="ar-prompt">
-            <img src="ar_hand_prompt.png">
+            <img src="ar_hand_prompt.png" />
           </div>
         </model-viewer>
 
@@ -168,108 +201,111 @@
           <button id="ar-canopyOff">Canopy Off</button>
         </div>
       </div>
-      
+
       <div class="controls">
         <button id="canopyOn" class="active">Canopy On</button>
         <button id="canopyOff">Canopy Off</button>
       </div>
     </div>
-    
+
     <script>
       // Get the model-viewer element
-      const modelViewer = document.getElementById('model-viewer');
-      const loadingOverlay = document.getElementById('loading-overlay');
-      const buttons = document.querySelectorAll('.controls button');
-      const arButtons = document.querySelectorAll('.ar-controls button');
-      
+      const modelViewer = document.getElementById("model-viewer");
+      const loadingOverlay = document.getElementById("loading-overlay");
+      const buttons = document.querySelectorAll(".controls button");
+      const arButtons = document.querySelectorAll(".ar-controls button");
+
       // Track current model state
-      let currentModel = 'with_Canopy.glb';
+      let currentModel = "with_Canopy.glb";
       let isInAR = false;
-      
+
       // Function to show active button
       function setActiveButton(activeButton, buttonGroup) {
-        buttonGroup.forEach(button => {
-          button.classList.remove('active');
+        buttonGroup.forEach((button) => {
+          button.classList.remove("active");
         });
-        activeButton.classList.add('active');
+        activeButton.classList.add("active");
       }
-      
+
       // Show loading overlay when loading starts
-      modelViewer.addEventListener('loading', function() {
-        loadingOverlay.style.display = 'flex';
+      modelViewer.addEventListener("loading", function () {
+        loadingOverlay.style.display = "flex";
       });
-      
+
       // Hide loading overlay when the model is loaded
-      modelViewer.addEventListener('load', function() {
-        loadingOverlay.style.display = 'none';
+      modelViewer.addEventListener("load", function () {
+        loadingOverlay.style.display = "none";
       });
-      
+
       // Switch model function (works in both normal and AR modes)
       function switchModel(modelSrc, canopyOnButton, canopyOffButton) {
         if (currentModel !== modelSrc) {
           currentModel = modelSrc;
-          
+
           // If we're not in AR mode, show loading overlay
           if (!isInAR) {
-            loadingOverlay.style.display = 'flex';
+            loadingOverlay.style.display = "flex";
           }
-          
+
           modelViewer.src = modelSrc;
-          
+
           // Update active button states
-          if (modelSrc === 'with_Canopy.glb') {
-            setActiveButton(document.getElementById('canopyOn'), buttons);
-            setActiveButton(document.getElementById('ar-canopyOn'), arButtons);
+          if (modelSrc === "with_Canopy.glb") {
+            setActiveButton(document.getElementById("canopyOn"), buttons);
+            setActiveButton(document.getElementById("ar-canopyOn"), arButtons);
           } else {
-            setActiveButton(document.getElementById('canopyOff'), buttons);
-            setActiveButton(document.getElementById('ar-canopyOff'), arButtons);
+            setActiveButton(document.getElementById("canopyOff"), buttons);
+            setActiveButton(document.getElementById("ar-canopyOff"), arButtons);
           }
         }
       }
-      
+
       // Add event listeners to normal mode buttons
-      document.getElementById('canopyOn').addEventListener('click', () => {
-        switchModel('with_Canopy.glb');
+      document.getElementById("canopyOn").addEventListener("click", () => {
+        switchModel("with_Canopy.glb");
       });
-      
-      document.getElementById('canopyOff').addEventListener('click', () => {
-        switchModel('without_Canopy.glb');
+
+      document.getElementById("canopyOff").addEventListener("click", () => {
+        switchModel("without_Canopy.glb");
       });
-      
+
       // Add event listeners to AR mode buttons
-      document.getElementById('ar-canopyOn').addEventListener('click', () => {
-        switchModel('with_Canopy.glb');
+      document.getElementById("ar-canopyOn").addEventListener("click", () => {
+        switchModel("with_Canopy.glb");
       });
-      
-      document.getElementById('ar-canopyOff').addEventListener('click', () => {
-        switchModel('without_Canopy.glb');
+
+      document.getElementById("ar-canopyOff").addEventListener("click", () => {
+        switchModel("without_Canopy.glb");
       });
-      
+
       // Monitor AR mode status
-      modelViewer.addEventListener('ar-status', (event) => {
-        if (event.detail.status === 'session-started') {
-          console.log('AR session started');
+      modelViewer.addEventListener("ar-status", (event) => {
+        if (event.detail.status === "session-started") {
+          console.log("AR session started");
           isInAR = true;
           // AR session has started, making buttons visible is handled by CSS
-        } else if (event.detail.status === 'session-ended') {
-          console.log('AR session ended');
+        } else if (event.detail.status === "session-ended") {
+          console.log("AR session ended");
           isInAR = false;
-        } else if (event.detail.status === 'failed') {
-          console.log('AR session failed to start');
+        } else if (event.detail.status === "failed") {
+          console.log("AR session failed to start");
           isInAR = false;
         }
       });
-      
+
       // Handle model changes requested within AR
-      modelViewer.addEventListener('ar-status', (event) => {
-        if (event.detail.status === 'object-placed') {
-          console.log('Object placed in AR');
+      modelViewer.addEventListener("ar-status", (event) => {
+        if (event.detail.status === "object-placed") {
+          console.log("Object placed in AR");
           // Additional functionality when object is placed
         }
       });
     </script>
-    
+
     <!-- Loads <model-viewer> for browsers: -->
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+    <script
+      type="module"
+      src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"
+    ></script>
   </body>
 </html>
