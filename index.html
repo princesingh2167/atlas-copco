@@ -150,7 +150,7 @@
         </div>
         
         <!-- <model-viewer> HTML element -->
-        <model-viewer id="model-viewer" src="1700x.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="1">
+        <model-viewer id="model-viewer" src="with_Canopy.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="1">
           <div class="progress-bar hide" slot="progress-bar">
             <div class="update-bar"></div>
           </div>
@@ -183,7 +183,7 @@
       const arButtons = document.querySelectorAll('.ar-controls button');
       
       // Track current model state
-      let currentModel = '1700x.glb';
+      let currentModel = 'with_Canopy.glb';
       let isInAR = false;
       
       // Function to show active button
@@ -217,7 +217,7 @@
           modelViewer.src = modelSrc;
           
           // Update active button states
-          if (modelSrc === '1700x.glb') {
+          if (modelSrc === 'with_Canopy.glb') {
             setActiveButton(document.getElementById('canopyOn'), buttons);
             setActiveButton(document.getElementById('ar-canopyOn'), arButtons);
           } else {
@@ -229,7 +229,7 @@
       
       // Add event listeners to normal mode buttons
       document.getElementById('canopyOn').addEventListener('click', () => {
-        switchModel('1700x.glb');
+        switchModel('with_Canopy.glb');
       });
       
       document.getElementById('canopyOff').addEventListener('click', () => {
@@ -238,7 +238,7 @@
       
       // Add event listeners to AR mode buttons
       document.getElementById('ar-canopyOn').addEventListener('click', () => {
-        switchModel('1700x.glb');
+        switchModel('with_Canopy.glb');
       });
       
       document.getElementById('ar-canopyOff').addEventListener('click', () => {
